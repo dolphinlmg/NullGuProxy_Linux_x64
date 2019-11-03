@@ -52,6 +52,10 @@ n_Frame* n_Pcap::recognizePacket() {
         if (dynamic_cast<n_IP*>(ret)->getProtocol() == 6){
             delete ret;
             ret = new n_TCP(this->packet, this->header);
+            if (dynamic_cast<n_TCP*>(ret)->isTLS()) {
+                delete ret;
+                ret = new n_TLS(this->packet, this->header);
+            }
         }
     }
     return ret;
@@ -60,6 +64,10 @@ n_Frame* n_Pcap::recognizePacket() {
 // get next packet & recognize packet, returns result of getNextPacket()
 int n_Pcap::operator>>(n_Frame* &packet) {
     int ret = this->getNextPacket();
+    if (ret == -1 || ret == -2) {
+        std::cerr << "Error to get next packet" << std::endl;
+        exit(-1);
+    }
     packet = this->recognizePacket();
     return ret;
 }

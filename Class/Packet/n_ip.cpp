@@ -11,7 +11,7 @@ n_IP::n_IP(const uint8_t* data, pcap_pkthdr* header) : n_Ethernet (data, header)
 }
 
 // return iphdr*
-iphdr* n_IP::getIPData() const {
+iphdr* n_IP::getIPHeader() const {
     return this->ip_header;
 }
 
@@ -102,9 +102,8 @@ uint16_t n_IP::calcIPChecksum() {
     struct iphdr* iph = new iphdr;
     memcpy(iph, this->ip_header, this->getSizeOfIPHeader());
     iph->check = 0;//set Checksum field 0
-
     uint16_t checksum = ip_checksum(reinterpret_cast<uint16_t*>(iph), iph->ihl*4);
-
+    delete iph;
     return checksum;
 }
 
